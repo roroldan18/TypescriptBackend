@@ -3,6 +3,8 @@ import Usuario from '../models/usuarios.model';
 import bcrypt from 'bcrypt';
 import Token from '../class/token';
 import { verificarToken } from '../middlewares/authentication';
+import { EmailClass } from '../class/email'
+
 
 
 
@@ -19,9 +21,25 @@ userRoutes.get('/prueba', (req:Request, res:Response) => {
     })
 });
 
+
+userRoutes.get('/', verificarToken, async (req:any, res:Response) => {
+    const usuario = req. usuario;
+
+    const email = new EmailClass();
+
+    const emailInfo = await email.enviarEmail("rodrigo.roldan18@gmail.com", "envio_email", "Cuerpo de email", "<h1>Hola mundo</h1>")
+
+    res.json({
+        estado:'success',
+        mensaje: usuario,
+        emailInfo: emailInfo
+    })
+
+})
+
 // Con el parametro req, es donde almacenamos todo lo que nos mandan en una peticion
 //1- SERVICIO PARA CREAR USUARIOS
-userRoutes.post('/create', (req: Request, res:Response) => {
+userRoutes.post('/create', async (req: Request, res:Response) => {
     
     const user = {
         nombre: req.body.nombre,
@@ -30,11 +48,32 @@ userRoutes.post('/create', (req: Request, res:Response) => {
         avatar: req.body.avatar
     }
 
+    const emailEnvio = new EmailClass();
+    //OPCION 1 PARA ENVIAR MAIL AL CREAR UN USUARIO
+    /*await emailEnvio.enviarEmail(user.email, "Creacion cuenta", "su cuenta se ha creado con exito", ""); */
+
+    
+    //Con ASYNC AWAIT
+/*     const result = await Usuario.create(user);
+    const envio = await emailEnvio.enviarEmail(user.email, "Creacion cuenta", "su cuenta se ha creado con exito", "");
+
+    res.json({
+        estado: 'success',
+        mensaje: result,
+        emailResult: envio
+    }) */
+
+
+    //CON PROMESAS
     Usuario.create(user)
         .then(result => {
+
+            const envio = emailEnvio.enviarEmail(user.email, "Creacion cuenta", "su cuenta se ha creado con exito", "");
+
             res.json({
                 estado: 'success',
-                mensaje: result
+                mensaje: result,
+                emailresult: envio
             })
         })
         .catch(error => {

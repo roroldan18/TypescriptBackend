@@ -6,6 +6,8 @@ import bodyParser from 'body-parser';
 import userSQLRoutes from './routes/userSQL';
 import postRouter from './routes/post';
 import fileUpload from 'express-fileupload';
+import fs from 'fs';
+import path from 'path';
 
 //Creando servidor web
 const server = new Server();
@@ -15,6 +17,13 @@ const server = new Server();
 server.start(() => {
     console.log(`Servidor corriendo en puerto ${server.puerto} y en host ${server.host}`)
 });
+
+
+const pathUploads = path.resolve(__dirname, 'uploads');
+if(!fs.existsSync(pathUploads)){
+    fs.mkdirSync(pathUploads);
+}
+
 
 //Incorporo el Body Parser
 server.app.use(bodyParser.urlencoded({extended:true}));

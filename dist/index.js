@@ -11,12 +11,18 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const userSQL_1 = __importDefault(require("./routes/userSQL"));
 const post_1 = __importDefault(require("./routes/post"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 //Creando servidor web
 const server = new server_1.default();
 //Inicio el servidor
 server.start(() => {
     console.log(`Servidor corriendo en puerto ${server.puerto} y en host ${server.host}`);
 });
+const pathUploads = path_1.default.resolve(__dirname, 'uploads');
+if (!fs_1.default.existsSync(pathUploads)) {
+    fs_1.default.mkdirSync(pathUploads);
+}
 //Incorporo el Body Parser
 server.app.use(body_parser_1.default.urlencoded({ extended: true }));
 server.app.use(body_parser_1.default.json());
